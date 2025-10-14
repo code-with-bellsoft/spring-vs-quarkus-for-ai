@@ -1,0 +1,52 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-svq
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama/data:/root/.ollama
+      - ./ollama/init:/init
+    environment:
+      - OLLAMA_KEEP_ALIVE=-1
+      # Actually shows you the input prompts and responses in the logs
+      - OLLAMA_DEBUG=2
+    entrypoint: [ "/bin/sh", "/init/run_ollama.sh" ]
+    restart: unless-stopped
+
+  backend-quarkus:
+    profiles: [ "quarkus" ]
+    build:
+      context: ./backend-quarkus/
+    container_name: backend
+    depends_on:
+      - ollama
+    environment:
+      - OLLAMA_HOST=http://ollama-svq:11434
+      - QUARKUS_LANGCHAIN4J_OLLAMA_BASE-URL=http://ollama-svq:11434
+    ports:
+      - "8080:8080"
+
+  backend-spring:
+    profiles: [ "spring" ]
+    build:
+      context: ./backend-spring/
+      dockerfile: Dockerfile
+    container_name: backend
+    depends_on:
+      - ollama
+    environment:
+      - SPRING_AI_OLLAMA_BASE_URL=http://ollama-svq:11434
+      - SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL=llama3.2:1b
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    environment:
+      - BACKEND_URL=http://backend:8080
+    ports:
+      - "8081:8081"
