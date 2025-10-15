@@ -100,11 +100,10 @@ public class MainView extends VerticalLayout {
                 .post()
                 .uri("/translate/" + targetLanguage)
                 .contentType(MediaType.TEXT_PLAIN)
-                .accept(MediaType.APPLICATION_NDJSON)
+                .accept(MediaType.TEXT_PLAIN)
                 .bodyValue(txt)
                 .retrieve()
-                .bodyToFlux(new ParameterizedTypeReference<Map<String, String>>() {})
-                .map(m -> m.getOrDefault("delta", ""));
+                .bodyToFlux(String.class);
     }
 
     private Flux<String> onAsk(String message) {
@@ -116,11 +115,10 @@ public class MainView extends VerticalLayout {
         return webClient.post()
                 .uri("/chat")
                 .contentType(MediaType.TEXT_PLAIN)
-                .accept(MediaType.APPLICATION_NDJSON)
+                .accept(MediaType.TEXT_PLAIN)
                 .bodyValue(txt)
                 .retrieve()
-                .bodyToFlux(new ParameterizedTypeReference<Map<String, String>>() {})
-                .map(m -> m.getOrDefault("delta", ""));
+                .bodyToFlux(String.class);
     }
 
 
