@@ -1,5 +1,7 @@
 # Spring vs. Quarkus
 
+Watch the full explanation on [Youtube](https://www.youtube.com/live/rBxcwi_t_LE?si=167bLCVYlCdmZRQy).
+
 ## Spring
 Start framework:
 ```
